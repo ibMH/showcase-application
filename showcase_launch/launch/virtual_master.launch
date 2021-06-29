@@ -1,14 +1,18 @@
 <launch>
-  <group ns="virtual_master">
-    <include file="$(find mir_description)/launch/upload_mir_urdf.launch"/>
+
+  <arg name="model_name" default="virtual_master"/>
+  <arg name="robot_urdf_path" value="$(find mir_description)/urdf/mir_200/mir_200.gazebo.urdf"/>
+
+  <group ns="$(arg model_name)">
+    <param name="robot_description" command="$(find xacro)/xacro $(arg robot_urdf_path) robot_namespace:=$(arg model_name) tf_prefix:=$(arg model_name)" />
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
-        <param name="tf_prefix" value="master"/>
+        <param name="tf_prefix" value="$(arg model_name)"/>
     </node>
 
     <node name="base_link_broadcaster" pkg="transport_launcher" type="base_broadcaster.py">
       <remap from="robot_pose" to="master_pose"/>
-      <param name="tf_prefix" value="master"/>
+      <param name="tf_prefix" value="$(arg model_name)/"/>
     </node>  
 
     <node name="fake_mir_joint_publisher" pkg="mir_driver" type="fake_mir_joint_publisher.py" output="screen" />    
